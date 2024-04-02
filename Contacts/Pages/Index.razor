@@ -1,0 +1,62 @@
+﻿@page "/"
+@using global::Contacts.Dados
+
+
+<PageTitle>Index</PageTitle>
+@{
+    if (isLoading)
+    {
+        <text>Carregando...</text>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Contato</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var contact in Contact)
+                {
+                    <tr>
+                        <td>@contact.Name</td>
+                        <td>@contact.ContactNumber</td>
+                        <td>@contact.Email</td>
+                        <td>
+                            <a href="/contact/detail/@contact.Id"><button>Details</button></a> |
+                            <a href="/contact/edit/@contact.Id"><button>Edit</button></a> |
+                            <button>Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <a href="/contact/new/"><button>New</button></a>
+    }
+}
+
+@code{
+    public List<Contact> Contact { get; set; } = new();
+        public bool isLoading = true;
+
+        protected override async Task OnInitializedAsync()
+        {
+            await GetContacts();
+        }
+
+        public async Task GetContacts()
+        {
+            var httpClient = HttpClientFactory.CreateClient("api");
+            var response = await httpClient.GetAsync("/contact");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                Contact = JsonSerializer.Deserialize<List<Contact>>(content);
+                isLoading = false;
+            }
+        }
+}

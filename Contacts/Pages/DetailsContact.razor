@@ -1,0 +1,63 @@
+﻿@page "/contact/detail/{idContact}"
+<PageTitle>Details Contact</PageTitle>
+<style>
+    .details-container {
+        width: 300px;
+        margin: auto;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+    }
+
+        .details-container h2 {
+            text-align: center;
+        }
+
+        .details-container div {
+            margin-bottom: 10px;
+        }
+
+        .details-container label {
+            font-weight: bold;
+        }
+
+        .details-container span {
+            display: inline-block;
+            margin-left: 10px;
+        }
+</style>
+
+@{
+    if (isLoading)
+    {
+        <text>Carregando...</text>
+    }
+    else
+    {
+        <EditForm Model="@Contact" OnValidSubmit="@Delete" FormName="contact">
+            <div class="details-container">
+                <h2>Details Contact</h2>
+
+                <div>
+                    <label for="name">Nome:</label>
+                    <span id="name">@Contact.Name</span>
+                </div>
+
+                <div>
+                    <label for="contact">Contato:</label>
+                    <span id="contact">@Contact.ContactNumber</span>
+                </div>
+
+                <div>
+                    <label for="email">Email:</label>
+                    <span id="email">@Contact.Email</span>
+                </div>
+            </div>
+            <div>
+                <a href="/contact/edit/@Contact.Id"><button>Edit</button></a> |
+                <button type="submit">Delete</button>
+            </div>
+        </EditForm>
+        
+    }
+}

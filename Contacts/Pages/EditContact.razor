@@ -1,0 +1,33 @@
+﻿@page "/contact/edit/{idContact}"
+@using System.Reflection.Metadata
+@using System.Text
+
+<h3>Edit Contact</h3>
+@{
+    if (isLoading)
+    {
+        <text>Carregando...</text>
+    }
+    else
+    {
+        <EditForm Model="@Contact" OnValidSubmit="@UpdateAsync" FormName="contactEdit">
+            <DataAnnotationsValidator />
+
+            <div>
+                <label for="Name">Nome:</label>
+                <InputText id="Name" @bind-Value="@Contact.Name" />
+            </div>
+            <div>
+                <label for="ContactNumber">Contato:</label>
+                <InputNumber id="ContactNumber" @bind-Value="@Contact.ContactNumber" />
+            </div>
+            <div>
+                <label for="Email">Email:</label>
+                <InputText id="Email" @bind-Value="@Contact.Email" InputMode="email" />
+            </div>
+
+            <button type="submit">Salvar</button>
+        </EditForm>
+    }
+}
+

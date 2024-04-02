@@ -1,0 +1,28 @@
+﻿@page "/contact/new/"
+@using System.Reflection.Metadata
+@using System.Text
+@using Microsoft.AspNetCore.Mvc
+
+<h3>New Contact</h3>
+
+
+<EditForm Model="@Contact" OnValidSubmit="@OnPostAsync" FormName="form">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label for="name">Name:</label>
+        <InputText id="name" @bind-Value="Contact.Name" />
+    </div>
+    <div>
+        <label for="contactNumber">Contact Number:</label>
+        <InputNumber id="contactNumber" @bind-Value="Contact.ContactNumber" />
+    </div>
+    <div>
+        <label for="email">Email:</label>
+        <InputText id="email" @bind-Value="Contact.Email" />
+    </div>
+    <div>
+        <button type="submit">Submit</button>
+    </div>
+</EditForm>
