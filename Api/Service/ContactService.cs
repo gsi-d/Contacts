@@ -1,29 +1,20 @@
-﻿using Contacts.Dados;
+﻿using Api.Data;
+using Contacts.Dados;
 
 namespace Api.Service
 {
     public class ContactService : IContactService
     {
-        //Mock Data
-        List<Contact> Contacts = new List<Contact>
-            {
-                new Contact { Id = 1, Name = "Alice", ContactNumber = "98765432", Email = "alice@example.com" },
-                new Contact { Id = 2, Name = "Bob", ContactNumber = "98765432", Email = "bob@example.com" },
-                new Contact { Id = 3, Name = "Charlie", ContactNumber = "12312312", Email = "charlie@example.com" },
-                new Contact { Id = 4, Name = "David", ContactNumber = "45645645", Email = "david@example.com" },
-                new Contact { Id = 5, Name = "Eve", ContactNumber = "78978978", Email = "eve@example.com" },
-                new Contact { Id = 6, Name = "Frank", ContactNumber = "11122233", Email = "frank@example.com" },
-                new Contact { Id = 7, Name = "Grace", ContactNumber = "44455566", Email = "grace@example.com" },
-                new Contact { Id = 8, Name = "Hannah", ContactNumber = "77788899", Email = "hannah@example.com" },
-                new Contact { Id = 9, Name = "Ian", ContactNumber = "33344455", Email = "ian@example.com" },
-                new Contact { Id = 10, Name = "Jane", ContactNumber = "66677788", Email = "jane@example.com" },
-                new Contact { Id = 11, Name = "Kyle", ContactNumber = "22233344", Email = "kyle@example.com" },
-                new Contact { Id = 12, Name = "Laura", ContactNumber = "98765432", Email = "laura@example.com" }
-            };
+        private readonly ApplicationDbContext _context;
+
+        public ContactService(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
         public List<Contact> OnGet()
         {
-            return Contacts;
+            return _context.Contact.ToList();
         }
 
         public async Task OnPost(ContactRequest request)
@@ -34,48 +25,63 @@ namespace Api.Service
                 Name = request.Name,
                 Email = request.Email,
             };
-            await Task.Factory.StartNew(() =>
-            {
-                Contacts.Add(contact);
-            });
+            _context.Contact.Add(contact);
+            _context.SaveChanges();
         }
 
         public async Task Update(Contact contact)
         {
-            await Task.Factory.StartNew(() =>
+            try
             {
-                Contact contactUpdate = Contacts.FirstOrDefault(x => x.Id == contact.Id);
-                Contacts.Remove(contactUpdate);
-                Contacts.Add(contact);
-            });
+                var existingContact = await _context.Contact.FindAsync(contact.Id);
+                if (existingContact != null)
+                {
+                    _context.Entry(existingContact).CurrentValues.SetValues(contact);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    _context.Contact.Update(contact);
+                    await _context.SaveChangesAsync();
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
         public Contact GetById(int id)
         {
-            var contact = Contacts.FirstOrDefault(x => x.Id == id);
-            return contact;
+            return _context.Contact.FirstOrDefault(x => x.Id == id);
         }
 
         public int Delete(int id)
         {
-            Contact contactToDelete = Contacts.FirstOrDefault(x => x.Id == id);
-            Contacts.Remove(contactToDelete);
+            Contact contactToDelete = _context.Contact.FirstOrDefault(x => x.Id == id);
+            _context.Remove(contactToDelete);
+            _context.SaveChanges();
             return contactToDelete.Id;
         }
 
-        public bool VerifyUniqueContactNumber(string contactNumber)
+        public bool VerifyUniqueContactNumber(string contactNumber, int id = 0)
         {
-            return Contacts.Any(x => x.ContactNumber == contactNumber);
+            if (id != 0)
+                return _context.Contact.Where(x => x.Id != id).Any(x => x.ContactNumber == contactNumber);
+            return false;
         }
 
-        public bool VerifyUniqueEmail(string email)
+        public bool VerifyUniqueEmail(string email, int id = 0)
         {
-            return Contacts.Any(x => x.Email == email);
+            if (id != 0)
+                return _context.Contact.Where(x => x.Id != id).Any(x => x.Email == email);
+            return false;
         }
 
         public bool VerifyContactNumberLenght(string contactNumber)
         {
-            return contactNumber.Length != 9;
+            return contactNumber.ToString().Length != 9;
         }
     }
 }

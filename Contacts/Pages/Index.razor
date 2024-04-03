@@ -67,7 +67,7 @@
         else
         {
             isLoading = false;
-            await _jsRunTime.InvokeVoidAsync("alert", "Erro ao retornar listagem de registros. Verifique sua conexão com a API e tente novamente.");
+            await _jsRunTime.InvokeVoidAsync("alert", "Error returning contacts listing.Please check your API connection and try again.");
         }
     }
 
@@ -79,12 +79,12 @@
         if (response.IsSuccessStatusCode)
         {
 
-            await _jsRunTime.InvokeVoidAsync("alert", "Registro excluído com sucesso!");
+            await _jsRunTime.InvokeVoidAsync("alert", "Contact deleted successfully!");
         }
         else
         {
             var responseMessage = await response.Content.ReadAsStringAsync();
-            await _jsRunTime.InvokeVoidAsync("alert", $"Erro: " + responseMessage);
+            await _jsRunTime.InvokeVoidAsync("alert", $"Error: " + responseMessage);
         }
     }
 }
