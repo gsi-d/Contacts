@@ -4,10 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-var serverVersion = new MySqlServerVersion(new Version(8, 0, 26));
+var serverVersion = new MySqlServerVersion(new Version(10, 6));
 
 var connectionString = builder.Configuration.GetConnectionString("MariaDB");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -23,16 +22,12 @@ builder.Services.AddControllersWithViews()
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
     });
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IContactService, ContactService>();
 
 var app = builder.Build();
-
-
 
 app.UseHttpsRedirection();
 
