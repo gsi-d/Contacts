@@ -11,34 +11,36 @@
     else
     {
         <div class="d-flex justify-content-center align-items-center table-bordered ">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th class="d-flex ms-5 me-4">Contact Number</th>
-                        <th>Email</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var contact in Contact)
-                    {
+
+                <table>
+                    <thead>
                         <tr>
-                            <td>@contact.Name</td>
-                            <td class="d-flex ms-5 me-4 align-items-center">@contact.ContactNumber</td> 
-                            <td>@contact.Email</td> |
-                            <td>
-                                <a href="/contact/detail/@contact.Id"><button class="btn-primary">Details</button></a> |
-                                <a href="/contact/edit/@contact.Id"><button class="btn-outline-primary">Edit</button></a> |
-                                <button class="btn-danger">Delete</button>
-                            </td>
+                            <th>Name</th>
+                            <th class="d-flex ms-5 me-4">Contact Number</th>
+                            <th>Email</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var contact in Contact)
+                        {
+                            <tr>
+                                <td>@contact.Name</td>
+                                <td class="d-flex ms-5 me-4 align-items-center">@contact.ContactNumber</td>
+                                <td>@contact.Email</td> |
+                                <td>
+                                    <a href="/contact/detail/@contact.Id"><button class="btn-primary">Details</button></a> |
+                                    <a href="/contact/edit/@contact.Id"><button class="btn-outline-primary">Edit</button></a> |
+                                    <button onclick="@(() => Delete(contact.Id))" class="btn-danger">Delete</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
         </div>
         <div class="d-flex justify-content-center align-items-center mt-4">
             <a href="/contact/new/"><button class="btn-success">New Register</button></a>
         </div>
+
     }
 }
 
@@ -66,6 +68,23 @@
         {
             isLoading = false;
             await _jsRunTime.InvokeVoidAsync("alert", "Erro ao retornar listagem de registros. Verifique sua conexão com a API e tente novamente.");
+        }
+    }
+
+    public async Task Delete(int id)
+    {
+        var httpClient = HttpClientFactory.CreateClient("api");
+        var response = await httpClient.DeleteAsync($"/contact/{id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+
+            await _jsRunTime.InvokeVoidAsync("alert", "Registro excluído com sucesso!");
+        }
+        else
+        {
+            var responseMessage = await response.Content.ReadAsStringAsync();
+            await _jsRunTime.InvokeVoidAsync("alert", $"Erro: " + responseMessage);
         }
     }
 }

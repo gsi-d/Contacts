@@ -35,7 +35,7 @@ namespace Api.Controllers
             if (_contactService.VerifyUniqueContactNumber(request.ContactNumber))
                 return BadRequest("This contact number is already registered!");
             if (_contactService.VerifyUniqueEmail(request.Email))
-                return BadRequest("\r\nThis email is already registered!");
+                return BadRequest("This email is already registered!");
             _contactService.OnPost(request);
             return Ok();
         }
@@ -45,10 +45,10 @@ namespace Api.Controllers
         {
             if (_contactService.GetById(contact.Id) == null)
                 return NotFound();
-            if (_contactService.VerifyUniqueContactNumber(contact.ContactNumber))
+            if (_contactService.VerifyUniqueContactNumber(contact.ContactNumber, contact.Id))
                 return BadRequest("This contact number is already registered!");
-            if (_contactService.VerifyUniqueEmail(contact.Email))
-                return BadRequest("\r\nThis email is already registered!");
+            if (_contactService.VerifyUniqueEmail(contact.Email, contact.Id))
+                return BadRequest("This email is already registered!");
             _contactService.Update(contact);
             return Ok();
         }
