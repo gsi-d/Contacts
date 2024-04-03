@@ -11,8 +11,11 @@ var serverVersion = new MySqlServerVersion(new Version(8, 0, 26));
 
 var connectionString = builder.Configuration.GetConnectionString("MariaDB");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(connectionString, serverVersion)
-);
+    options.UseMySql(
+        connectionString,
+        ServerVersion.AutoDetect(connectionString),
+        mysqlOptions => mysqlOptions.EnableRetryOnFailure()
+    ));
 
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
@@ -25,17 +28,11 @@ builder.Services.AddControllersWithViews();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<IContactService, ContactService>();
+builder.Services.AddScoped<IContactService, ContactService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
 
 app.UseHttpsRedirection();
 

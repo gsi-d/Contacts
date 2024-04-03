@@ -10,53 +10,62 @@
     }
     else
     {
-        <table>
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Contato</th>
-                    <th>Email</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var contact in Contact)
-                {
+        <div class="d-flex justify-content-center align-items-center table-bordered ">
+            <table>
+                <thead>
                     <tr>
-                        <td>@contact.Name</td>
-                        <td>@contact.ContactNumber</td>
-                        <td>@contact.Email</td>
-                        <td>
-                            <a href="/contact/detail/@contact.Id"><button>Details</button></a> |
-                            <a href="/contact/edit/@contact.Id"><button>Edit</button></a> |
-                            <button>Delete</button>
-                        </td>
+                        <th>Name</th>
+                        <th class="d-flex ms-5 me-4">Contact Number</th>
+                        <th>Email</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-        <a href="/contact/new/"><button>New</button></a>
+                </thead>
+                <tbody>
+                    @foreach (var contact in Contact)
+                    {
+                        <tr>
+                            <td>@contact.Name</td>
+                            <td class="d-flex ms-5 me-4 align-items-center">@contact.ContactNumber</td> 
+                            <td>@contact.Email</td> |
+                            <td>
+                                <a href="/contact/detail/@contact.Id"><button class="btn-primary">Details</button></a> |
+                                <a href="/contact/edit/@contact.Id"><button class="btn-outline-primary">Edit</button></a> |
+                                <button class="btn-danger">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex justify-content-center align-items-center mt-4">
+            <a href="/contact/new/"><button class="btn-success">New Register</button></a>
+        </div>
     }
 }
 
-@code{
+@code {
     public List<Contact> Contact { get; set; } = new();
-        public bool isLoading = true;
+    public bool isLoading = true;
 
-        protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        await GetContacts();
+    }
+
+    public async Task GetContacts()
+    {
+        var httpClient = HttpClientFactory.CreateClient("api");
+        var response = await httpClient.GetAsync("/contact");
+
+        if (response.IsSuccessStatusCode)
         {
-            await GetContacts();
+            var content = await response.Content.ReadAsStringAsync();
+            Contact = JsonSerializer.Deserialize<List<Contact>>(content);
+            isLoading = false;
         }
-
-        public async Task GetContacts()
+        else
         {
-            var httpClient = HttpClientFactory.CreateClient("api");
-            var response = await httpClient.GetAsync("/contact");
-
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                Contact = JsonSerializer.Deserialize<List<Contact>>(content);
-                isLoading = false;
-            }
+            isLoading = false;
+            await _jsRunTime.InvokeVoidAsync("alert", "Erro ao retornar listagem de registros. Verifique sua conexão com a API e tente novamente.");
         }
+    }
 }

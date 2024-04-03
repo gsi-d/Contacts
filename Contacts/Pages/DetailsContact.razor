@@ -2,16 +2,14 @@
 <PageTitle>Details Contact</PageTitle>
 <style>
     .details-container {
-        width: 300px;
+        width: 80vw;
         margin: auto;
         border: 1px solid #ccc;
         border-radius: 5px;
+        border-color: black;
         padding: 10px;
     }
 
-        .details-container h2 {
-            text-align: center;
-        }
 
         .details-container div {
             margin-bottom: 10px;
@@ -39,6 +37,10 @@
                 <h2>Details Contact</h2>
 
                 <div>
+                    <label for="id">Id:</label>
+                    <span id="id">@Contact.Id</span>
+                </div>
+                <div>
                     <label for="name">Nome:</label>
                     <span id="name">@Contact.Name</span>
                 </div>
@@ -53,9 +55,9 @@
                     <span id="email">@Contact.Email</span>
                 </div>
             </div>
-            <div>
-                <a href="/contact/edit/@Contact.Id"><button>Edit</button></a> |
-                <button type="submit">Delete</button>
+            <div class="mt-4">
+                <a href="/contact/edit/@Contact.Id"><button class="btn-primary">Edit</button></a> |
+                <button type="submit" class="btn-danger">Delete</button>
             </div>
         </EditForm>
         

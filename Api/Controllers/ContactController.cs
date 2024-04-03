@@ -30,6 +30,12 @@ namespace Api.Controllers
         [IgnoreAntiforgeryToken]
         public IActionResult Create([FromBody] ContactRequest request)
         {
+            if (_contactService.VerifyContactNumberLenght(request.ContactNumber))
+                return BadRequest("The contact number is invalid!");
+            if (_contactService.VerifyUniqueContactNumber(request.ContactNumber))
+                return BadRequest("This contact number is already registered!");
+            if (_contactService.VerifyUniqueEmail(request.Email))
+                return BadRequest("\r\nThis email is already registered!");
             _contactService.OnPost(request);
             return Ok();
         }
@@ -39,8 +45,12 @@ namespace Api.Controllers
         {
             if (_contactService.GetById(contact.Id) == null)
                 return NotFound();
+            if (_contactService.VerifyUniqueContactNumber(contact.ContactNumber))
+                return BadRequest("This contact number is already registered!");
+            if (_contactService.VerifyUniqueEmail(contact.Email))
+                return BadRequest("\r\nThis email is already registered!");
             _contactService.Update(contact);
-            return NoContent();
+            return Ok();
         }
 
         [HttpDelete("{id}")]

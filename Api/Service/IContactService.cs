@@ -10,5 +10,8 @@ namespace Api.Service
         Task Update(Contact contact);
         Contact GetById(int id);
         int Delete(int id);
+        bool VerifyUniqueContactNumber(string contactNumber);
+        bool VerifyUniqueEmail(string email);
+        bool VerifyContactNumberLenght(string contactNumber);
     }
 }

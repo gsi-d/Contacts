@@ -1,5 +1,6 @@
 ﻿using Contacts.Dados;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Text;
 using System.Text.Json;
 
@@ -11,6 +12,7 @@ namespace Contacts.Pages
         public string IdContact { get; set; } = string.Empty;
         public Contact Contact { get; set; } = new();
         public bool isLoading = true;
+
 
         protected override async Task OnInitializedAsync()
         {
@@ -41,7 +43,14 @@ namespace Contacts.Pages
 
             if (response.IsSuccessStatusCode)
             {
+
+                await _jsRunTime.InvokeVoidAsync("alert", "Registro alterado com sucesso!");
                 _navigationManager.NavigateTo("/");
+            }
+            else
+            {
+                var responseMessage = await response.Content.ReadAsStringAsync();
+                await _jsRunTime.InvokeVoidAsync("alert", $"Erro: " + responseMessage);
             }
         }
     }

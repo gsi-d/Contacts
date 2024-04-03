@@ -1,33 +1,43 @@
 ﻿@page "/contact/edit/{idContact}"
 @using System.Reflection.Metadata
 @using System.Text
+@using Contacts.Shared
 
-<h3>Edit Contact</h3>
 @{
     if (isLoading)
     {
+        <div class="d-flex justify-content-center align-items-center mb-3 mt-3">
+            <h3>Edit Contact</h3>
+        </div>
         <text>Carregando...</text>
     }
     else
     {
-        <EditForm Model="@Contact" OnValidSubmit="@UpdateAsync" FormName="contactEdit">
-            <DataAnnotationsValidator />
+        <div class="d-flex justify-content-center align-items-center mb-3 mt-3">
+            <h3>Edit Contact</h3>
+        </div>
+        <div class="d-flex justify-content-center align-items-center">
+            <EditForm Model="@Contact" OnValidSubmit="@UpdateAsync" FormName="form">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
-            <div>
-                <label for="Name">Nome:</label>
-                <InputText id="Name" @bind-Value="@Contact.Name" />
-            </div>
-            <div>
-                <label for="ContactNumber">Contato:</label>
-                <InputNumber id="ContactNumber" @bind-Value="@Contact.ContactNumber" />
-            </div>
-            <div>
-                <label for="Email">Email:</label>
-                <InputText id="Email" @bind-Value="@Contact.Email" InputMode="email" />
-            </div>
-
-            <button type="submit">Salvar</button>
-        </EditForm>
+                <div class="d-flex flex-column mb-3 ">
+                    <label for="name">Name:</label>
+                    <InputText id="name" class="rounded-3" @bind-Value="Contact.Name" />
+                </div>
+                <div class="d-flex flex-column mb-3 ">
+                    <label for="contactNumber">Contact Number:</label>
+                    <InputText id="contactNumber" class="rounded-3" @bind-Value="Contact.ContactNumber" />
+                </div>
+                <div class="d-flex flex-column mb-3">
+                    <label for="email">Email:</label>
+                    <InputText id="email" class="rounded-3" @bind-Value="Contact.Email" />
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn-success rounded-3">Submit</button>
+                </div>
+            </EditForm>
+        </div>
     }
 }
 

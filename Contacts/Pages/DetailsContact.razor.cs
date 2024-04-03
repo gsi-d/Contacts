@@ -1,5 +1,6 @@
 ﻿using Contacts.Dados;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Text.Json;
 
 namespace Contacts.Pages
@@ -27,6 +28,11 @@ namespace Contacts.Pages
                 Contact = JsonSerializer.Deserialize<Contact>(content);
                 isLoading = false;
             }
+            else
+            {
+                isLoading = false;
+                await _jsRunTime.InvokeVoidAsync("alert", "Erro ao exibir detalhes do registro.");
+            }
         }
 
         public async Task Delete()
@@ -36,7 +42,14 @@ namespace Contacts.Pages
 
             if (response.IsSuccessStatusCode)
             {
+
+                await _jsRunTime.InvokeVoidAsync("alert", "Registro excluído com sucesso!");
                 _navigationManager.NavigateTo("/");
+            }
+            else
+            {
+                var responseMessage = await response.Content.ReadAsStringAsync();
+                await _jsRunTime.InvokeVoidAsync("alert", $"Erro: " + responseMessage);
             }
         }
     }

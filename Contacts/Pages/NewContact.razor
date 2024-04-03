@@ -3,26 +3,28 @@
 @using System.Text
 @using Microsoft.AspNetCore.Mvc
 
-<h3>New Contact</h3>
+<div class="d-flex justify-content-center align-items-center mb-3 mt-3">
+    <h3>New Contact</h3>
+</div>
+<div class="d-flex justify-content-center align-items-center">
+    <EditForm Model="@Contact" OnValidSubmit="@OnPostAsync" FormName="form">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-
-<EditForm Model="@Contact" OnValidSubmit="@OnPostAsync" FormName="form">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div>
-        <label for="name">Name:</label>
-        <InputText id="name" @bind-Value="Contact.Name" />
-    </div>
-    <div>
-        <label for="contactNumber">Contact Number:</label>
-        <InputNumber id="contactNumber" @bind-Value="Contact.ContactNumber" />
-    </div>
-    <div>
-        <label for="email">Email:</label>
-        <InputText id="email" @bind-Value="Contact.Email" />
-    </div>
-    <div>
-        <button type="submit">Submit</button>
-    </div>
-</EditForm>
+        <div class="d-flex flex-column mb-3 ">
+            <label for="name">Name:</label>
+            <InputText id="name" class="rounded-3" @bind-Value="Contact.Name" />
+        </div>
+        <div class="d-flex flex-column mb-3 ">
+            <label for="contactNumber">Contact Number:</label>
+            <InputText id="contactNumber" class="rounded-3" @bind-Value="Contact.ContactNumber" />
+        </div>
+        <div class="d-flex flex-column mb-3">
+            <label for="email">Email:</label>
+            <InputText id="email" class="rounded-3" @bind-Value="Contact.Email" />
+        </div>
+        <div class="mt-3">
+            <button type="submit" class="btn-success rounded-3">Submit</button>
+        </div>
+    </EditForm>
+</div>
