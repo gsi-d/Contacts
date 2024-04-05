@@ -1,4 +1,5 @@
 ﻿using Contacts.Dados;
+using Contacts.Service;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Text;
@@ -9,10 +10,10 @@ namespace Contacts.Pages
     public partial class NewContact
     {
         [Parameter] public Contact Contact { get; set; } = new();
+        [Inject] private IContactService _contactService { get; set; }
 
         public async Task OnPostAsync()
         {
-            var httpClient = HttpClientFactory.CreateClient("api");
 
             ContactRequest request = new ContactRequest
             {
@@ -20,21 +21,17 @@ namespace Contacts.Pages
                 ContactNumber = Contact.ContactNumber,
                 Email = Contact.Email
             };
-            var json = JsonSerializer.Serialize(request);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await httpClient.PostAsync("/contact", content);
+            var response = await _contactService.OnPost(request);
 
-            if (response.IsSuccessStatusCode)
+            if (response.IsCompleted)
             {
-
                 await _jsRunTime.InvokeVoidAsync("alert", "Contact successfully registered!");
                 _navigationManager.NavigateTo("/");
             }
             else
             {
-                var responseMessage = await response.Content.ReadAsStringAsync();
-                await _jsRunTime.InvokeVoidAsync("alert", $"Error: " + responseMessage);
+                await _jsRunTime.InvokeVoidAsync("alert", $"Error: " + response);
             }
         }
     }

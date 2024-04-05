@@ -8,13 +8,17 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 
 var serverVersion = new MySqlServerVersion(new Version(10, 6));
 
-var connectionString = builder.Configuration.GetConnectionString("MariaDB");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(
-        connectionString,
-        ServerVersion.AutoDetect(connectionString),
-        mysqlOptions => mysqlOptions.EnableRetryOnFailure()
-    ));
+    options.UseSqlServer(connectionString, sqlServerOptionsAction: sqlOptions =>
+    {
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5, // Número máximo de retentativas
+            maxRetryDelay: TimeSpan.FromSeconds(30), // Tempo máximo de espera entre as retentativas
+            errorNumbersToAdd: null // Códigos de erro específicos do SQL Server para considerar nas retentativas
+        );
+    }));
+
 
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>

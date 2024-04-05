@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using Contacts.Service
 @using global::Contacts.Dados
 
 
@@ -45,6 +46,8 @@
 }
 
 @code {
+
+    [Inject] private IContactService _contactService { get; set; }
     public List<Contact> Contact { get; set; } = new();
     public bool isLoading = true;
 
@@ -53,38 +56,46 @@
         await GetContacts();
     }
 
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetContacts();
+
+            if (!Contact.Any())
+            {
+                await _jsRunTime.InvokeVoidAsync("alert", "Error returning contacts listing. Please check your connection and try again.");
+            }
+        }
+    }
+
     public async Task GetContacts()
     {
-        var httpClient = HttpClientFactory.CreateClient("api");
-        var response = await httpClient.GetAsync("/contact");
+        List<Contact> contactsList = _contactService.OnGet();
 
-        if (response.IsSuccessStatusCode)
+        if (contactsList.Count() > 0)
         {
-            var content = await response.Content.ReadAsStringAsync();
-            Contact = JsonSerializer.Deserialize<List<Contact>>(content);
+            Contact = contactsList;
             isLoading = false;
         }
         else
         {
+            Contact = new List<Contact>();
             isLoading = false;
-            await _jsRunTime.InvokeVoidAsync("alert", "Error returning contacts listing.Please check your API connection and try again.");
         }
     }
 
     public async Task Delete(int id)
     {
-        var httpClient = HttpClientFactory.CreateClient("api");
-        var response = await httpClient.DeleteAsync($"/contact/{id}");
-
-        if (response.IsSuccessStatusCode)
+        int response = _contactService.Delete(id);
+        if (response != 0)
         {
-
             await _jsRunTime.InvokeVoidAsync("alert", "Contact deleted successfully!");
+            _navigationManager.NavigateTo(_navigationManager.Uri, forceLoad: true);
         }
         else
         {
-            var responseMessage = await response.Content.ReadAsStringAsync();
-            await _jsRunTime.InvokeVoidAsync("alert", $"Error: " + responseMessage);
+            await _jsRunTime.InvokeVoidAsync("alert", "Error when deleting contact.");
         }
     }
 }
