@@ -22,6 +22,10 @@
                 <ValidationSummary />
 
                 <div class="d-flex flex-column mb-3 ">
+                    <label for="name">Id:</label>
+                    <InputNumber disabled id="id" class="rounded-3" @bind-Value="Contact.Id" />
+                </div>
+                <div class="d-flex flex-column mb-3 ">
                     <label for="name">Name:</label>
                     <InputText id="name" class="rounded-3" @bind-Value="Contact.Name" />
                 </div>

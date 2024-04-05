@@ -1,4 +1,4 @@
-﻿using Contacts.Dados;
+﻿using Contacts.Model;
 using Contacts.Service;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -10,12 +10,11 @@ namespace Contacts.Pages
     public partial class NewContact
     {
         [Parameter] public Contact Contact { get; set; } = new();
-        [Inject] private IContactService _contactService { get; set; }
+        [Inject] private IContactService? _contactService { get; set; }
 
         public async Task OnPostAsync()
         {
-
-            ContactRequest request = new ContactRequest
+            Contact request = new Contact
             {
                 Name = Contact.Name,
                 ContactNumber = Contact.ContactNumber,
@@ -24,9 +23,9 @@ namespace Contacts.Pages
 
             var response = await _contactService.OnPost(request);
 
-            if (response.IsCompleted)
+            if (response == null)
             {
-                await _jsRunTime.InvokeVoidAsync("alert", "Contact successfully registered!");
+                await _jsRunTime.InvokeVoidAsync("alert", "Contact saved successfully!");
                 _navigationManager.NavigateTo("/");
             }
             else

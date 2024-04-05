@@ -1,4 +1,5 @@
-﻿using Contacts.Dados;
+﻿using Contacts.Model;
+using Contacts.Service;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Text.Json;
@@ -7,8 +8,8 @@ namespace Contacts.Pages
 {
     public partial class DetailsContact
     {
-        [Parameter]
-        public string IdContact { get; set; }
+        [Inject] private IContactService? _contactService { get; set; }
+        [Parameter] public string IdContact { get; set; }
         public Contact Contact { get; set; }
         public bool isLoading = true;
 
@@ -17,39 +18,47 @@ namespace Contacts.Pages
             await GetContact();
         }
 
+        protected async override Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                await GetContact();
+
+                if (Contact == null)
+                {
+                    await _jsRunTime.InvokeVoidAsync("alert", "Error showing contact. Please check your connection and try again.");
+                }
+            }
+        }
+
         public async Task GetContact()
         {
-            var httpClient = HttpClientFactory.CreateClient("api");
-            var response = await httpClient.GetAsync($"/contact/{IdContact}");
+            int idContact = Convert.ToInt32(IdContact);
+            Contact contact = _contactService.GetById(idContact);
 
-            if (response.IsSuccessStatusCode)
+            if (contact != null)
             {
-                var content = await response.Content.ReadAsStringAsync();
-                Contact = JsonSerializer.Deserialize<Contact>(content);
+                Contact = contact;
                 isLoading = false;
             }
             else
             {
+                Contact = new Contact();
                 isLoading = false;
-                await _jsRunTime.InvokeVoidAsync("alert", "Error showing contact details.");
             }
         }
 
         public async Task Delete()
         {
-            var httpClient = HttpClientFactory.CreateClient("api");
-            var response = await httpClient.DeleteAsync($"/contact/{IdContact}");
-
-            if (response.IsSuccessStatusCode)
+            int response = _contactService.Delete(Contact.Id);
+            if (response != 0)
             {
-
                 await _jsRunTime.InvokeVoidAsync("alert", "Contact deleted successfully!");
                 _navigationManager.NavigateTo("/");
             }
             else
             {
-                var responseMessage = await response.Content.ReadAsStringAsync();
-                await _jsRunTime.InvokeVoidAsync("alert", $"Error: " + responseMessage);
+                await _jsRunTime.InvokeVoidAsync("alert", "Error when deleting contact.");
             }
         }
     }

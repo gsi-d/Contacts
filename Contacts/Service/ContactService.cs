@@ -1,4 +1,4 @@
-﻿using Contacts.Dados;
+﻿using Contacts.Model;
 using Contacts.Data;
 
 namespace Contacts.Service
@@ -17,7 +17,7 @@ namespace Contacts.Service
             return _context.Contact.ToList();
         }
 
-        public async Task<string> OnPost(ContactRequest request)
+        public async Task<string> OnPost(Contact request)
         {
             try
             {
@@ -43,26 +43,35 @@ namespace Contacts.Service
             }
         }
 
-        public async Task Update(Contact contact)
+        public async Task<string> Update(Contact contact)
         {
             try
             {
+                if (GetById(contact.Id) == null)
+                    throw new Exception("Contact not found.");
+                if (VerifyUniqueContactNumber(contact.ContactNumber, contact.Id))
+                    throw new Exception("This contact number is already registered!");
+                if (VerifyUniqueEmail(contact.Email, contact.Id))
+                    throw new Exception("This email is already registered!");
+
                 var existingContact = await _context.Contact.FindAsync(contact.Id);
                 if (existingContact != null)
                 {
                     _context.Entry(existingContact).CurrentValues.SetValues(contact);
-                    await _context.SaveChangesAsync();
+                    _context.SaveChanges();
+                    return null;
                 }
                 else
                 {
                     _context.Contact.Update(contact);
-                    await _context.SaveChangesAsync();
+                    _context.SaveChanges();
+                    return null;
                 }
 
             }
             catch (Exception ex)
             {
-
+                return ex.Message;
             }
         }
 

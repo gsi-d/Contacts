@@ -1,15 +1,14 @@
-﻿using Contacts.Dados;
+﻿using Contacts.Model;
+using Contacts.Service;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.Text;
-using System.Text.Json;
 
 namespace Contacts.Pages
 {
     public partial class EditContact
     {
-        [Parameter]
-        public string IdContact { get; set; } = string.Empty;
+        [Inject] private IContactService? _contactService { get; set; }
+        [Parameter] public string? IdContact { get; set; }
         public Contact Contact { get; set; } = new();
         public bool isLoading = true;
 
@@ -19,38 +18,48 @@ namespace Contacts.Pages
             await GetContact();
         }
 
+        protected async override Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                await GetContact();
+
+                if (Contact == null)
+                {
+                    await _jsRunTime.InvokeVoidAsync("alert", "Error showing contact. Please check your connection and try again.");
+                }
+            }
+        }
+
         public async Task GetContact()
         {
-            var httpClient = HttpClientFactory.CreateClient("api");
-            var response = await httpClient.GetAsync($"/contact/{IdContact}");
+            int idContact = Convert.ToInt32(IdContact);
+            Contact contact = _contactService.GetById(idContact);
 
-            if (response.IsSuccessStatusCode)
+            if (contact != null)
             {
-                var content = await response.Content.ReadAsStringAsync();
-                Contact = JsonSerializer.Deserialize<Contact>(content);
+                Contact = contact;
+                isLoading = false;
+            }
+            else
+            {
+                Contact = new Contact();
                 isLoading = false;
             }
         }
 
         public async Task UpdateAsync()
         {
-            var httpClient = HttpClientFactory.CreateClient("api");
+            var response = await _contactService.Update(Contact);
 
-            var json = JsonSerializer.Serialize(Contact);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var response = await httpClient.PutAsync("/contact/", content);
-
-            if (response.IsSuccessStatusCode)
+            if (response == null)
             {
-
-                await _jsRunTime.InvokeVoidAsync("alert", "Contact successfully updated!");
+                await _jsRunTime.InvokeVoidAsync("alert", "Contact updated successfully!");
                 _navigationManager.NavigateTo("/");
             }
             else
             {
-                var responseMessage = await response.Content.ReadAsStringAsync();
-                await _jsRunTime.InvokeVoidAsync("alert", $"Error: " + responseMessage);
+                await _jsRunTime.InvokeVoidAsync("alert", $"Error: " + response);
             }
         }
     }

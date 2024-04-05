@@ -1,6 +1,6 @@
 ﻿@page "/"
 @using Contacts.Service
-@using global::Contacts.Dados
+@using global::Contacts.Model
 
 
 <PageTitle>Index</PageTitle>
@@ -64,7 +64,6 @@
 
             if (!Contact.Any())
             {
-                await _jsRunTime.InvokeVoidAsync("alert", "Error returning contacts listing. Please check your connection and try again.");
             }
         }
     }
