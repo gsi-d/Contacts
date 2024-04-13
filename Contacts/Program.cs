@@ -36,6 +36,17 @@ builder.Services.AddServerSideBlazor();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetService<ApplicationDbContext>();
+
+    if (dbContext != null)
+    {
+        dbContext.Database.Migrate();
+    }
+}
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
